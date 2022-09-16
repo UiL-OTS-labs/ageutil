@@ -29,7 +29,7 @@ Same question but for 2 to 3 month old babies?
 age(months=2).to(months=3).range()
 ```
 
-What's the range of possible birthdays for people who were younger than 12 when the Berlin wall torn down?
+What's the range of possible birthdays for people who were younger than 12 when the Berlin wall was torn down?
 
 ```python
 age(12).or_younger().on(1989, 11, 9).range()

@@ -20,7 +20,7 @@ age(18).range()
 What's the range of possible birthdays for people who are 18-21 years old today?
 
 ```python
-age(18, 21).range()
+age(18).to(21).range()
 ```
 
 Same question but for 2 to 3 month old babies?

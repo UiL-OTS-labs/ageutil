@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional
+from typing import Optional, Union
 from calendar import monthrange
 
 
@@ -53,7 +53,7 @@ class AgePredicate:
         upper, lower = self.range()
         return (upper is None or date >= upper) and (lower is None or date <= lower)
 
-    def on(self, on: datetime.date | int, month: Optional[int] = None, day: Optional[int] = None):
+    def on(self, on: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
         if isinstance(on, int):
             if month is None or day is None:
                 raise TypeError()
@@ -94,7 +94,7 @@ class AgePredicate:
 
 
 class AgeCalc:
-    def __init__(self, year: datetime.date | int, month: Optional[int] = None,
+    def __init__(self, year: Union[datetime.date, int], month: Optional[int] = None,
                  day: Optional[int] = None):
         if isinstance(year, datetime.date):
             self.dob = year
@@ -105,7 +105,7 @@ class AgeCalc:
 
         self._on = datetime.date.today()
 
-    def on(self, on: datetime.date | int, month: Optional[int] = None, day: Optional[int] = None):
+    def on(self, on: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
         if isinstance(on, int):
             if month is None or day is None:
                 raise TypeError()
@@ -142,5 +142,5 @@ def age(years: Optional[int] = None, *, months: Optional[int] = None,
     return AgePredicate(years, months, days)
 
 
-def dob(year: datetime.date | int, month: Optional[int] = None, day: Optional[int] = None):
+def dob(year: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
     return AgeCalc(year, month, day)

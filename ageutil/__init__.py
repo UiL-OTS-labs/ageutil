@@ -3,7 +3,7 @@ from typing import Optional
 from calendar import monthrange
 
 
-def month_diff(a, b):
+def month_diff(a: datetime.date, b: datetime.date):
     diff = b - a
     days = abs(diff.days)
     sign = days // diff.days
@@ -26,6 +26,13 @@ def month_diff(a, b):
         months += 1
 
     return months * sign, days
+
+
+def month_add(d: datetime.date, months: int):
+    for i in range(months):
+        days_in_month = monthrange(d.year, d.month)[1]
+        d += datetime.timedelta(days=days_in_month)
+    return d
 
 
 class AgePredicate:
@@ -123,7 +130,11 @@ class AgeCalc:
         return self._age_full()
 
     def range_for(self, pred: AgePredicate):
-        ...
+        lower = self.dob + datetime.timedelta(days=(pred.lower[0] * 365 + pred.lower[2]))
+        lower = month_add(lower, pred.lower[1])
+        upper = self.dob + datetime.timedelta(days=(pred.upper[0] * 365 + pred.upper[2]))
+        upper = month_add(upper, pred.upper[1])
+        return (lower, upper)
 
 
 def age(years: Optional[int] = None, months: Optional[int] = None,

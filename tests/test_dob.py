@@ -19,5 +19,5 @@ class TestAgeCalc(TestCase):
             (date(2001, 5, 1), date(2002, 11, 30)))
 
         self.assertEqual(
-            dob(2000, 5, 1).range_for(age(1, 1, 1).to(2, 6, 15)),
+            dob(2000, 5, 1).range_for(age(1, months=1, days=1).to(2, 6, 15)),
             (date(2001, 6, 2), date(2002, 11, 16)))

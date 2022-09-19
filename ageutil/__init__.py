@@ -137,7 +137,7 @@ class AgeCalc:
         return (lower, upper)
 
 
-def age(years: Optional[int] = None, months: Optional[int] = None,
+def age(years: Optional[int] = None, *, months: Optional[int] = None,
         days: Optional[int] = None) -> AgePredicate:
     return AgePredicate(years, months, days)
 

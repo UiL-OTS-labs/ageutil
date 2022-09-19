@@ -18,3 +18,10 @@ class TestAgePredicate(TestCase):
 
     def test_months_range(self):
         self.assertEqual(age(0, months=1).on(2000, 6, 1).range(), (date(2000, 4, 2), date(2000, 5, 1)))
+
+        # also test wrap around to previous year
+        self.assertEqual(age(0, months=1).on(2000, 1, 1).range(), (date(1999, 11, 2), date(1999, 12, 1)))
+
+    def test_months_more_than_12(self):
+        self.assertTrue(
+            age(months=24).on(2022, 1, 1).check(date(2020, 1, 1)))

@@ -29,9 +29,19 @@ def month_diff(a: datetime.date, b: datetime.date):
 
 
 def month_add(d: datetime.date, months: int):
+    if months == 0:
+        return d
+
+    backwards = months < 0
+    months = abs(months)
+
     for i in range(months):
-        days_in_month = monthrange(d.year, d.month)[1]
-        d += datetime.timedelta(days=days_in_month)
+        if backwards:
+            days_in_month = monthrange(d.year, 1 + (d.month - 2) % 12)[1]
+            d += datetime.timedelta(days=-days_in_month)
+        else:
+            days_in_month = monthrange(d.year, d.month)[1]
+            d += datetime.timedelta(days=days_in_month)
     return d
 
 
@@ -68,13 +78,15 @@ class AgePredicate:
         upper, lower = None, None
         if self.lower is not None:
             lower = datetime.date(self._on.year - self.lower[0],
-                                  (self._on.month - 1 - self.lower[1]) % 12 + 1,
+                                  self._on.month,
                                   self._on.day) - datetime.timedelta(self.lower[2])
+            lower = month_add(lower, -self.lower[1])
 
         if self.upper is not None:
             upper = datetime.date(self._on.year - self.upper[0],
-                                  (self._on.month - 1 - self.upper[1]) % 12 + 1,
+                                  self._on.month,
                                   self._on.day) - datetime.timedelta(self.upper[2])
+            upper = month_add(upper, -self.upper[1])
         return (upper, lower)
 
     def to(self, years: Optional[int] = None, months: Optional[int] = None,

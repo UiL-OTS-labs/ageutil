@@ -47,12 +47,15 @@ def month_add(d: datetime.date, months: int):
 
 class AgePredicate:
     def __init__(self, years, months, days):
-        self.lower = (years or 0,
-                      months if months is not None else 0,
-                      days if days is not None else 0)
-        self.upper = (years + 1 if (years is not None and months is None) else (years or 0),
-                      months + 1 if (months is not None and days is None) else (months or 0),
-                      days if days is not None else -1)
+        self.lower, self.upper = None, None
+
+        if years is not None or months is not None or days is not None:
+            self.lower = (years or 0,
+                          months if months is not None else 0,
+                          days if days is not None else 0)
+            self.upper = (years + 1 if (years is not None and months is None) else (years or 0),
+                          months + 1 if (months is not None and days is None) else (months or 0),
+                          days if days is not None else -1)
 
         self._on = datetime.date.today()
 
@@ -91,6 +94,9 @@ class AgePredicate:
 
     def to(self, years: Optional[int] = None, months: Optional[int] = None,
            days: Optional[int] = None):
+        if years is None and months is None and days is None:
+            return self.or_older()
+
         self.upper = (years + 1 if (years is not None and months is None) else (years or 0),
                       months + 1 if (months is not None and days is None) else (months or 0),
                       days if days is not None else -1)
@@ -142,10 +148,14 @@ class AgeCalc:
         return self._age_full()
 
     def range_for(self, pred: AgePredicate):
-        lower = self.dob + datetime.timedelta(days=(pred.lower[0] * 365 + pred.lower[2]))
-        lower = month_add(lower, pred.lower[1])
-        upper = self.dob + datetime.timedelta(days=(pred.upper[0] * 365 + pred.upper[2]))
-        upper = month_add(upper, pred.upper[1])
+        upper, lower = None, None
+        if pred.lower is not None:
+            lower = self.dob + datetime.timedelta(days=(pred.lower[0] * 365 + pred.lower[2]))
+            lower = month_add(lower, pred.lower[1])
+
+        if pred.upper is not None:
+            upper = self.dob + datetime.timedelta(days=(pred.upper[0] * 365 + pred.upper[2]))
+            upper = month_add(upper, pred.upper[1])
         return (lower, upper)
 
 

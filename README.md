@@ -53,3 +53,18 @@ During what date range was that person between 3 to 6 years old?
 ```python
 dob(2000, 1, 1).range_for(age(3).to(6))
 ```
+
+
+### Testing age
+
+There are several options for checking whether a person's age falls within a certain range:
+
+```python
+from datetime import date
+from ageutil import age
+age_pred = age(2).to(3).on(2021, 1, 1)
+
+age_pred(date(2019, 1, 1))  # True
+age_pred.check(date(2019, 1, 1))  # True
+date(2019, 1, 1) in age_pred  # True
+```

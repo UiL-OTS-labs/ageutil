@@ -1,7 +1,7 @@
 from unittest import TestCase
 from datetime import date
 
-from ageutil import age
+from ageutil import age, dob
 
 
 class TestAgePredicate(TestCase):
@@ -25,3 +25,9 @@ class TestAgePredicate(TestCase):
     def test_months_more_than_12(self):
         self.assertTrue(
             age(months=24).on(2022, 1, 1).check(date(2020, 1, 1)))
+
+    def test_age_contains_date(self):
+        self.assertTrue(
+            date(2000, 1, 1) in age(1, months=0, days=0).on(2001, 1, 1))
+        self.assertFalse(
+            date(2000, 1, 1) in age(2, months=0, days=0).on(2001, 1, 1))

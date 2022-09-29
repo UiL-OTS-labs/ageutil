@@ -59,10 +59,10 @@ class AgePredicate:
 
         self._on = datetime.date.today()
 
-    def __call__(self, date):
+    def __call__(self, date: datetime.date):
         return self.check(date)
 
-    def check(self, date):
+    def check(self, date: datetime.date):
         upper, lower = self.range()
         return (upper is None or date >= upper) and (lower is None or date <= lower)
 
@@ -109,6 +109,9 @@ class AgePredicate:
     def or_younger(self):
         self.lower = None
         return self
+
+    def __contains__(self, date: datetime.date):
+        return self.check(date)
 
 
 class AgeCalc:

@@ -1,7 +1,7 @@
 from unittest import TestCase
 from datetime import date
 
-from ageutil import age, dob
+from ageutil import age, date_of_birth as dob
 
 
 class TestAgeCalc(TestCase):

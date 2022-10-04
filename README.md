@@ -39,19 +39,19 @@ age(12).or_younger().on(1989, 11, 9).range()
 ### Age calculation
 
 ```python
-from ageutil import dob
+from ageutil import date_of_birth
 ```
 
 What's the exact age (years, months, days) of someone born on the first day of 2000?
 
 ```python
-dob(2000, 1, 1).age_ymd()
+date_of_birth(2000, 1, 1).age_ymd()
 ```
 
 During what date range was that person between 3 to 6 years old?
 
 ```python
-dob(2000, 1, 1).range_for(age(3).to(6))
+date_of_birth(2000, 1, 1).range_for(age(3).to(6))
 ```
 
 

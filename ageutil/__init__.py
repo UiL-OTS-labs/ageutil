@@ -167,5 +167,5 @@ def age(years: Optional[int] = None, *, months: Optional[int] = None,
     return AgePredicate(years, months, days)
 
 
-def dob(year: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
+def date_of_birth(year: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
     return AgeCalc(year, month, day)

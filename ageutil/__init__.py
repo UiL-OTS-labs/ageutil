@@ -6,6 +6,9 @@ from calendar import monthrange
 def month_diff(a: datetime.date, b: datetime.date):
     diff = b - a
     days = abs(diff.days)
+    if diff.days == 0:
+        return 0, 0
+
     sign = days // diff.days
     month = (min(a, b)).month
     year = (min(a, b)).year

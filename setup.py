@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/UiL-OTS-labs/ageutil",
     packages=setuptools.find_packages(),
+    package_data=dict(ageutil=['py.typed']),
     license_files=('LICENSE',),
     install_requires=[
     ],

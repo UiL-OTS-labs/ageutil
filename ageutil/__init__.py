@@ -1,13 +1,18 @@
 import datetime
-from typing import Optional, Union
+from collections import namedtuple
+from typing import Optional, Union, Tuple
 from calendar import monthrange
 
 
-def month_diff(a: datetime.date, b: datetime.date):
+MonthSpan = namedtuple('MonthSpan', 'months, days')
+DateSpan = namedtuple('DateSpan', 'years, months, days')
+
+
+def month_diff(a: datetime.date, b: datetime.date) -> MonthSpan:
     diff = b - a
     days = abs(diff.days)
     if diff.days == 0:
-        return 0, 0
+        return MonthSpan(0, 0)
 
     sign = days // diff.days
     month = (min(a, b)).month
@@ -28,10 +33,11 @@ def month_diff(a: datetime.date, b: datetime.date):
             month += 1
         months += 1
 
-    return months * sign, days
+    return MonthSpan(months * sign, days)
 
 
-def month_add(d: datetime.date, months: int):
+def month_add(d: datetime.date, months: int) -> datetime.date:
+    """returns date that is `months` months in the future/past"""
     if months == 0:
         return d
 
@@ -49,27 +55,34 @@ def month_add(d: datetime.date, months: int):
 
 
 class AgePredicate:
-    def __init__(self, years, months, days):
+    lower: Optional[DateSpan]
+    upper: Optional[DateSpan]
+
+    def __init__(self, years: Optional[int], months: Optional[int], days: Optional[int]):
         self.lower, self.upper = None, None
 
         if years is not None or months is not None or days is not None:
-            self.lower = (years or 0,
-                          months if months is not None else 0,
-                          days if days is not None else 0)
-            self.upper = (years + 1 if (years is not None and months is None) else (years or 0),
-                          months + 1 if (months is not None and days is None) else (months or 0),
-                          days if days is not None else -1)
+            self.lower = DateSpan(years or 0,
+                                  months if months is not None else 0,
+                                  days if days is not None else 0)
+            self.upper = DateSpan(
+                years + 1 if (years is not None and months is None) else (years or 0),
+                months + 1 if (months is not None and days is None) else (months or 0),
+                days if days is not None else -1)
 
         self._on = datetime.date.today()
 
-    def __call__(self, date: datetime.date):
+    def __call__(self, date: datetime.date) -> bool:
         return self.check(date)
 
     def check(self, date: datetime.date):
+        if date is None:
+            raise TypeError('date cannot be None')
         upper, lower = self.range()
         return (upper is None or date >= upper) and (lower is None or date <= lower)
 
-    def on(self, on: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
+    def on(self, on: Union[datetime.date, int], month: Optional[int] = None,
+           day: Optional[int] = None):
         if isinstance(on, int):
             if month is None or day is None:
                 raise TypeError()
@@ -83,16 +96,16 @@ class AgePredicate:
     def range(self):
         upper, lower = None, None
         if self.lower is not None:
-            lower = datetime.date(self._on.year - self.lower[0],
+            lower = datetime.date(self._on.year - self.lower.years,
                                   self._on.month,
-                                  self._on.day) - datetime.timedelta(self.lower[2])
-            lower = month_add(lower, -self.lower[1])
+                                  self._on.day) - datetime.timedelta(self.lower.days)
+            lower = month_add(lower, -self.lower.months)
 
         if self.upper is not None:
-            upper = datetime.date(self._on.year - self.upper[0],
+            upper = datetime.date(self._on.year - self.upper.years,
                                   self._on.month,
-                                  self._on.day) - datetime.timedelta(self.upper[2])
-            upper = month_add(upper, -self.upper[1])
+                                  self._on.day) - datetime.timedelta(self.upper.days)
+            upper = month_add(upper, -self.upper.months)
         return (upper, lower)
 
     def to(self, years: Optional[int] = None, months: Optional[int] = None,
@@ -100,9 +113,9 @@ class AgePredicate:
         if years is None and months is None and days is None:
             return self.or_older()
 
-        self.upper = (years + 1 if (years is not None and months is None) else (years or 0),
-                      months + 1 if (months is not None and days is None) else (months or 0),
-                      days if days is not None else -1)
+        self.upper = DateSpan(years + 1 if (years is not None and months is None) else (years or 0),
+                              months + 1 if (months is not None and days is None) else (months or 0),
+                              days if days is not None else -1)
         return self
 
     def or_older(self):
@@ -129,7 +142,8 @@ class AgeCalc:
 
         self._on = datetime.date.today()
 
-    def on(self, on: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
+    def on(self, on: Union[datetime.date, int], month: Optional[int] = None,
+           day: Optional[int] = None):
         if isinstance(on, int):
             if month is None or day is None:
                 raise TypeError()
@@ -156,12 +170,12 @@ class AgeCalc:
     def range_for(self, pred: AgePredicate):
         upper, lower = None, None
         if pred.lower is not None:
-            lower = self.dob + datetime.timedelta(days=(pred.lower[0] * 365 + pred.lower[2]))
-            lower = month_add(lower, pred.lower[1])
+            lower = self.dob + datetime.timedelta(days=(pred.lower.years * 365 + pred.lower.days))
+            lower = month_add(lower, pred.lower.months)
 
         if pred.upper is not None:
-            upper = self.dob + datetime.timedelta(days=(pred.upper[0] * 365 + pred.upper[2]))
-            upper = month_add(upper, pred.upper[1])
+            upper = self.dob + datetime.timedelta(days=(pred.upper.years * 365 + pred.upper.days))
+            upper = month_add(upper, pred.upper.months)
         return (lower, upper)
 
 
@@ -170,5 +184,6 @@ def age(years: Optional[int] = None, *, months: Optional[int] = None,
     return AgePredicate(years, months, days)
 
 
-def date_of_birth(year: Union[datetime.date, int], month: Optional[int] = None, day: Optional[int] = None):
+def date_of_birth(year: Union[datetime.date, int], month: Optional[int] = None,
+                  day: Optional[int] = None) -> AgeCalc:
     return AgeCalc(year, month, day)

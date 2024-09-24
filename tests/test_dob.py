@@ -27,6 +27,10 @@ class TestAgeCalc(TestCase):
             dob(2000, 5, 1).range_for(age(1, months=1, days=1).to(2, 6, 15)),
             (date(2001, 6, 2), date(2002, 11, 16)))
 
+        self.assertEqual(
+            dob(2000, 1, 1).range_for(age(3).to(6)),
+            (date(2003, 1, 1), date(2006, 12, 31)))
+
     def test_dob_range_for_unlimited(self):
         self.assertEqual(
             dob(2000, 5, 1).range_for(age(1).or_older()),

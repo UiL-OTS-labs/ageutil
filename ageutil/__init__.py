@@ -170,12 +170,15 @@ class AgeCalc:
     def range_for(self, pred: AgePredicate):
         upper, lower = None, None
         if pred.lower is not None:
-            lower = self.dob + datetime.timedelta(days=(pred.lower.years * 365 + pred.lower.days))
-            lower = month_add(lower, pred.lower.months)
+            lower = self.dob
+            lower = month_add(lower, pred.lower.months + pred.lower.years * 12)
+            lower += datetime.timedelta(days=pred.lower.days)
 
         if pred.upper is not None:
-            upper = self.dob + datetime.timedelta(days=(pred.upper.years * 365 + pred.upper.days))
-            upper = month_add(upper, pred.upper.months)
+            upper = self.dob
+            upper = month_add(upper, pred.upper.months + pred.upper.years * 12)
+            upper += datetime.timedelta(days=pred.upper.days)
+
         return (lower, upper)
 
 

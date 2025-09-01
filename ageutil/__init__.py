@@ -156,7 +156,7 @@ class AgeCalc:
 
     def _age_full(self):
         diff = month_diff(self.dob, self._on)
-        return ((self._on - self.dob).days // 365, diff[0] % 12, diff[1])
+        return (diff[0] // 12, diff[0] % 12, diff[1])
 
     def age(self):
         return self._age_full()[0]

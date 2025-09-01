@@ -12,7 +12,19 @@ class TestAgeCalc(TestCase):
     def test_dob_age_ymd(self):
         self.assertEqual(
             dob(2000, 1, 1).on(2020, 12, 31).age_ymd(),
-            (21, 11, 30))
+            (20, 11, 30))
+
+        self.assertEqual(
+            dob(2000, 1, 1).on(2021, 1, 1).age_ymd(),
+            (21, 0, 0))
+
+        self.assertEqual(
+            dob(2000, 1, 1).on(2020, 12, 31).age_ym(),
+            (20, 11))
+
+        self.assertEqual(
+            dob(2000, 1, 1).on(2020, 12, 31).age(),
+            20)
 
     def test_dob_range_for(self):
         self.assertEqual(
